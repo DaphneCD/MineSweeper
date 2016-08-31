@@ -12,17 +12,16 @@ class Game_Service(object):
     def __init__(self,row_num,col_num):
         self._row_num=row_num
         self._col_num=col_num
-        if game is None:
-            global game
-            game=Board(row_num,col_num)
         mine_percent=0.3
         self._mine_num=int(mine_percent*float(self._row_num*self._col_num))
         self.shifts=[-1,0,1]
         
         
     def generate_map(self):
-    """ generate mine map
-    """
+        """ generate mine map
+        """
+        global game
+        game=Board(self._row_num,self._col_num)
         s=set([])
         while len(s)<=self._mine_num:
             i=random.randint(0, self._row_num*self._col_num-1)
@@ -36,9 +35,9 @@ class Game_Service(object):
     
 
     def _set_mine(self,index):
-    """ set cell[index] as a mine
-        and update its neighbor cell's mine number
-    """
+        """ set cell[index] as a mine
+            and update its neighbor cell's mine number
+        """
         game.get_cell(index).set_mine() #set current index as mine
         game.add_mine(index) #add index to mine_index
 
@@ -54,9 +53,9 @@ class Game_Service(object):
             
 
     def choose_mine(self,index):
-    """ choose a cell
-        return game status and cells need to change
-    """
+        """ choose a cell
+            return game status and cells need to change
+        """
         cell=game.get_cell(index)
         update_stack={'type':'continue'}
         
@@ -69,8 +68,8 @@ class Game_Service(object):
     
 
     def _flip(self,update_stack,index):
-    """ flip the chosen cell and its adjcent cells
-    """
+        """ flip the chosen cell and its adjcent cells
+        """
         cell=game.get_cell(index)
         if cell.ifFlipped()==False:
             cell.flip()
@@ -91,8 +90,8 @@ class Game_Service(object):
                     
 
     def _flipAll(self,update_stack):
-    """ flip all mines
-    """
+        """ flip all mines
+        """
         mines_index=game.get_mines()
         for i in mines_index:
             update_stack[str(i)]=status['end']
@@ -101,7 +100,7 @@ class Game_Service(object):
         update_stack['col_num']=self._col_num
         update_stack['_mine_num']=len(mines_index) 
         if len(mines_index)==game.get_remain():     
-            update_stack['type']='win'  
+            update_stack['type']='win' 
         else:
             update_stack['type']='lose'
             

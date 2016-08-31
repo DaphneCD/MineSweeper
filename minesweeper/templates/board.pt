@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+	<link rel="stylesheet" type="text/css" href="/static/board.css" />
     <title>MineSweeper</title>
 	<script type="text/javascript" src="/static/js/jquery-3.1.0.min.js"></script>
   </head>
@@ -21,14 +22,14 @@
 			   value="Start Game"/>
 	</form>
 	
-<!--	<span tal:replace="message"/> -->
+	<span id="message"/> 
 	<input tal:condition="row_num" type="hidden" id="hid_row_num" value="${row_num}"/>
 	<input tal:condition="col_num" type="hidden" id="hid_col_num" value="${col_num}"/>
 	
 	<table tal:condition="row_num">
 		<tr tal:repeat="r range(row_num)">
 			<td tal:repeat="c range(col_num)">
-				<button type="button" class="btn" id="btn_${r}_${c}" onclick="choose_mine(this.id)"/>
+				<button type="button" class="btn" id="btn_${r}_${c}" onclick="choose_mine(this.id)"> </button>
 			</td>
 		</tr>
 	</table>
@@ -36,33 +37,44 @@
 	<script>
 	function choose_mine(btn_id)
 	{
-		alert("choose_mine "+btn_id);
+	//	alert("choose_mine "+btn_id);
 		var res=btn_id.split("_");
-		alert(res);
 		var text = '{"row":'+res[1]+',"col":'+res[2]+',"row_num":'+${row_num}+',"col_num":'+${col_num}+'}';
-		alert(text);
+	//	alert(text);
 		var input_data=JSON.parse(text);
+		
 	//	alert(JSON.stringify(input_data, null, 4));
 		 $.ajax({
 			  type:'get',
 			  url:'./choose_mine',
 			  data:input_data,
 			  success: function(update_stack) {
-			//	alert(JSON.stringify(update_stack, null, 4));
+				alert(JSON.stringify(update_stack, null, 4));
 				$.each(update_stack, function(key, value) {
 					if(!isNaN(key))
 					{
 						var r=Math.floor(key/${col_num});
 						var c=key%${col_num};
-						alert('btn_'+r+'_'+c);
+					//	alert('btn_'+r+'_'+c);
 						
-						$("#btn_"+r+"_"+c).attr('disable', true);
-						if(update_stack['type']=='continue')
-							$("#btn_"+r+"_"+c).attr('value', value);
+						$("#btn_"+r+"_"+c).attr('disabled', true);
+						$("#btn_"+r+"_"+c).css('background-color', '#808080');
+						if(update_stack['type']=='continue')	
+							$("#btn_"+r+"_"+c).text(value);
 						else if(update_stack['type']=='win')
-							$("#btn_"+r+"_"+c).attr('value', '@');
+						{
+							$("#"+btn_id).css('border','2px solid red');
+							$("#btn_"+r+"_"+c).css('color', 'red');
+							$("#btn_"+r+"_"+c).text('@');
+							$("message").text('Congratulation! You win!');
+						}
 						else if(update_stack['type']=='lose')
-							$("#btn_"+r+"_"+c).attr('value', '*');
+						{
+							$("#"+btn_id).css('border','2px solid red');
+							$("#btn_"+r+"_"+c).css('color', 'red');
+							$("#btn_"+r+"_"+c).text('*');
+							$("message").text('Sorry, you lose.');
+						}
 					}
 				});
 			  }  
